@@ -1,0 +1,1205 @@
+BEGIN HEADER
+   CharacterSet "CP1252"
+   ExportingTool "IBM InfoSphere DataStage Export"
+   ToolVersion "8"
+   ServerName "DATASTAGEDES2"
+   ToolInstanceID "DWHFI"
+   MDISVersion "1.0"
+   Date "2021-11-17"
+   Time "15.53.24"
+   ServerVersion "11.5"
+END HEADER
+BEGIN DSJOB
+   Identifier "TE30DPO2_53_Cargar_Datos_Deuda_por_Interviniente"
+   DateModified "2021-08-06"
+   TimeModified "12.08.50"
+   BEGIN DSRECORD
+      Identifier "ROOT"
+      OLEType "CJobDefn"
+      Readonly "0"
+      Name "TE30DPO2_53_Cargar_Datos_Deuda_por_Interviniente"
+      NextID "8"
+      Container "V0"
+      FullDescription "Cadena que se encarga de leer el fichero del maestro del resultado de gestiones del fichero alojado en el servidor DS , previamente recogido por FTP del servdor SAP"
+      JobVersion "56.0.0"
+      ControlAfterSubr "0"
+      Parameters "CParameters"
+      BEGIN DSSUBRECORD
+         Name "PSBD_DWHFI"
+         Prompt "Parámetros PSBD_DWHFI"
+         Default "(As pre-defined)"
+         HelpTxt "Parámetros de la conexión DWHFI"
+         ParamType "13"
+         ParamLength "0"
+         ParamScale "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ParamSetPortFolio"
+         Prompt "ParamSetPortFolio parameters"
+         Default "(As pre-defined)"
+         HelpTxt "Juego de parámetros de PortFolio"
+         ParamType "13"
+         ParamLength "0"
+         ParamScale "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "AdvancedRuntimeOptions"
+         Value "#DSProjectARTOptions#"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceMode"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceSeq"
+         Value "1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceRecords"
+         Value "100"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TraceSkip"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TracePeriod"
+         Value "1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RecordJobPerformanceData"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "IdentList"
+         Value "Tratamiento|THD_INT_CRM_DEUDA_INTERVINIENTES"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "ClientCodePage"
+         Value "1252"
+      END DSSUBRECORD
+      NULLIndicatorPosition "0"
+      OrchestrateCode =+=+=+=
+#################################################################
+#### STAGE: tmp_TE30DP02_Deuda_por_Interviniente
+## Operator
+copy
+## General options
+[ident('tmp_TE30DP02_Deuda_por_Interviniente')]
+## Inputs
+0< [ds] '[&"ParamSetPortFolio.TgtDirectory"]/tmp_TE30DP02_Deuda_Intervinientes'
+## Outputs
+0> [modify (
+  ZRECOR_ID:not_nullable ustring[max=32]=ZRECOR_ID;
+  ZCRM_GUID:nullable ustring[max=32]=ZCRM_GUID;
+  ZPAREN_ID:nullable ustring[max=32]=ZPAREN_ID;
+  ZNUMCLI:nullable ustring[max=12]=ZNUMCLI;
+  ZTIT_DEU:nullable ustring[max=1]=ZTIT_DEU;
+  ZDEU_REC:nullable ustring[max=23]=ZDEU_REC;
+  ZDEU_TIT:nullable ustring[max=23]=ZDEU_TIT;
+  ZFRECIBO:nullable ustring[max=10]=ZFRECIBO;
+  ZTITPRIN:nullable ustring[max=1]=ZTITPRIN;
+  ZFMODIF1:nullable ustring[max=10]=ZFMODIF1;
+keep
+  ZRECOR_ID,ZCRM_GUID,ZPAREN_ID,ZNUMCLI,
+  ZTIT_DEU,ZDEU_REC,ZDEU_TIT,ZFRECIBO,
+  ZTITPRIN,ZFMODIF1;
+)] 'tmp_TE30DP02_Deuda_por_Interviniente:Leer.v'
+;
+
+#################################################################
+#### STAGE: Tratamiento
+## Operator
+transform
+## Operator options
+-flag run
+-name 'V0S12_TE30DPO2_53_Cargar_Datos_Deuda_por_Interviniente_Tratamiento'
+
+## General options
+[ident('Tratamiento'); jobmon_ident('Tratamiento')]
+## Inputs
+0< [] 'tmp_TE30DP02_Deuda_por_Interviniente:Leer.v'
+## Outputs
+0> [] 'Tratamiento:Cargar.v'
+;
+
+#################################################################
+#### STAGE: THD_INT_CRM_DEUDA_INTERVINIENTES
+## Operator
+pxbridge
+## Operator options
+-Orientation link
+-XMLProperties '<?xml version=\\'1.0\\' encoding=\\'UTF-16\\'?><Properties version=\\'1.1\\'><Common><Context type=\\'int\\'>2</Context><Variant type=\\'string\\'>9.1</Variant><DescriptorVersion type=\\'string\\'>1.0</DescriptorVersion><PartitionType type=\\'int\\'>9</PartitionType><RCP type=\\'int\\'>0</RCP></Common><Connection><Instance modified=\\'1\\' type=\\'string\\'><![CDATA[]]></Instance><Database modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PSBD_DWHFI.ConnectionString"]]]></Database><Username modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PSBD_DWHFI.Username"]]]></Username><Password modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PSBD_DWHFI.Password"]]]></Password><DB2ClientLibFile modified=\\'1\\' type=\\'string\\'><![CDATA[]]></DB2ClientLibFile><Conductor collapsed=\\'1\\' modified=\\'1\\' type=\\'bool\\'><![CDATA[0]]></Conductor><UseDirectConnections type=\\'bool\\'><![CDATA[0]]></UseDirectConnections><KeepConductorConnectionAlive type=\\'bool\\'><![CDATA[1]]></KeepConductorConnectionAlive></Connection><Usage><MigratedJob type=\\'bool\\'><![CDATA[0]]></MigratedJob><WriteMode modified=\\'1\\' type=\\'int\\'><![CDATA[3]]></WriteMode><GenerateSQL modified=\\'1\\' type=\\'bool\\'><![CDATA[1]]></GenerateSQL><TableName modified=\\'1\\' type=\\'string\\'><![CDATA[[&"PSBD_DWHFI.SchemaName"]THD_INT_CRM_DEUDA_INTERVINIENTES]]></TableName><EnableQuotedIDs type=\\'bool\\'><![CDATA[0]]></EnableQuotedIDs><XMLColumnAsLOB type=\\'bool\\'><![CDATA[0]]></XMLColumnAsLOB><PrefixForExpressionColumns type=\\'string\\'><![CDATA[EXPR]]></PrefixForExpressionColumns><SQL></SQL><TableAction collapsed=\\'1\\' modified=\\'1\\' type=\\'int\\'><![CDATA[0]]></TableAction><Transaction><RecordCount type=\\'int\\'><![CDATA[2000]]></RecordCount><TimeInterval type=\\'int\\'><![CDATA[0]]></TimeInterval></Transaction><Session><IsolationLevel type=\\'int\\'><![CDATA[1]]></IsolationLevel><AutocommitMode type=\\'int\\'><![CDATA[0]]></AutocommitMode><ArraySize type=\\'int\\'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type=\\'bool\\'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type=\\'bool\\'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type=\\'bool\\'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><FailOnRowErrorPX type=\\'bool\\'><![CDATA[1]]></FailOnRowErrorPX></Session><Logging><LogColumnValues modified=\\'1\\' type=\\'bool\\'><![CDATA[1]]><LogKeysOnly type=\\'bool\\'><![CDATA[0]]></LogKeysOnly><Delimiter modified=\\'1\\' type=\\'int\\'><![CDATA[1]]></Delimiter></LogColumnValues></Logging><BeforeAfter collapsed=\\'1\\' type=\\'bool\\'><![CDATA[0]]></BeforeAfter><ReOptimization type=\\'int\\'><![CDATA[2]]></ReOptimization><LockWaitMode collapsed=\\'1\\' type=\\'int\\'><![CDATA[1]]></LockWaitMode></Usage></Properties >'
+-connector '{
+   variant=\\'9.1\\', 
+   library=ccdb2, 
+   version=1.0, 
+   variantlist=\\'V1;9.1::ccdb2\\', 
+   versionlist=\\'1.0\\', 
+   name=DB2Connector
+}'
+-target 0 '{
+      DSIsKey={COD_RECORDID=1}, 
+      DSSQLType={COD_RECORDID=12, ID_CRMGUID=12, COD_PARENT=12, ID_CLIENTESAT=12, COD_VINCULACION=1, IMP_DEUDAREC=3, IMP_DEUDATITULAR=3, FECHA_ULTRECIMP=9, IND_TITULARPPAL=1, FECHA_MODIFI1=9}, 
+      DSDerivation={COD_RECORDID=\\'Leer\\.ZRECOR_ID\\', ID_CRMGUID=\\'Leer\\.ZCRM_GUID\\', COD_PARENT=\\'Leer\\.ZPAREN_ID\\', ID_CLIENTESAT=\\'Leer\\.ZNUMCLI\\', COD_VINCULACION=\\'Leer\\.ZTIT_DEU\\', IMP_DEUDAREC=\\'StringToDecimal(Leer\\.ZDEU_REC) \\', IMP_DEUDATITULAR=\\'StringToDecimal(Leer\\.ZDEU_TIT)\\', FECHA_ULTRECIMP=\\'IF len(TRIM(Leer\\.ZFRECIBO)) \\= 0 OR TRIM(Leer\\.ZFRECIBO) \\= \\\\\\'00000000\\\\\\'   
+THEN \\\\\\'0001\\-01\\-01\\\\\\' ELSE StringToDate(Leer\\.ZFRECIBO\\,\\"\\%yyyy\\%mm\\%dd\\") \\', IND_TITULARPPAL=\\'Leer\\.ZTITPRIN\\', FECHA_MODIFI1=\\'IF len(TRIM(Leer\\.ZFMODIF1)) \\= 0 OR TRIM(Leer\\.ZFMODIF1) \\= \\\\\\'00000000\\\\\\' 
+THEN \\\\\\'0001\\-01\\-01\\\\\\' ELSE StringToDate(Leer\\.ZFMODIF1\\,\\"\\%yyyy\\%mm\\%dd\\") \\'}, 
+      DSSQLPrecision={COD_RECORDID=32, ID_CRMGUID=32, COD_PARENT=32, ID_CLIENTESAT=12, COD_VINCULACION=1, IMP_DEUDAREC=17, IMP_DEUDATITULAR=17, FECHA_ULTRECIMP=10, IND_TITULARPPAL=1, FECHA_MODIFI1=10}, 
+      DSSQLScale={IMP_DEUDAREC=2, IMP_DEUDATITULAR=2}, 
+      DSSchema=\\'record
+         (
+           COD_RECORDID\\:string\\[max\\=32\\]\\;
+           ID_CRMGUID\\:nullable string\\[max\\=32\\]\\;
+           COD_PARENT\\:nullable string\\[max\\=32\\]\\;
+           ID_CLIENTESAT\\:nullable string\\[max\\=12\\]\\;
+           COD_VINCULACION\\:nullable string\\[1\\]\\;
+           IMP_DEUDAREC\\:nullable decimal\\[17\\,2\\]\\;
+           IMP_DEUDATITULAR\\:nullable decimal\\[17\\,2\\]\\;
+           FECHA_ULTRECIMP\\:nullable date\\;
+           IND_TITULARPPAL\\:nullable string\\[1\\]\\;
+           FECHA_MODIFI1\\:nullable date\\;
+         )\\'
+}'
+   
+
+## General options
+[ident('THD_INT_CRM_DEUDA_INTERVINIENTES'); jobmon_ident('THD_INT_CRM_DEUDA_INTERVINIENTES')]
+## Inputs
+0< [] 'Tratamiento:Cargar.v'
+;
+
+
+=+=+=+=
+      IsTemplate "0"
+      NLSLocale ",,,,"
+      JobType "3"
+      Category "\\Jobs\\E30\\PortFolio"
+      CenturyBreakYear "30"
+      NextAliasID "2"
+      ParameterFileDDName "DD00001"
+      ReservedWordCheck "1"
+      TransactionSize "0"
+      ValidationStatus "0"
+      Uploadable "0"
+      PgmCustomizationFlag "0"
+      JobReportFlag "0"
+      AllowMultipleInvocations "0"
+      Act2ActOverideDefaults "0"
+      Act2ActEnableRowBuffer "0"
+      Act2ActUseIPC "0"
+      Act2ActBufferSize "0"
+      Act2ActIPCTimeout "0"
+      ExpressionSemanticCheckFlag "0"
+      TraceOption "0"
+      EnableCacheSharing "0"
+      RuntimeColumnPropagation "0"
+      RelStagesInJobStatus "-1"
+      WebServiceEnabled "0"
+      MFProcessMetaData "0"
+      MFProcessMetaDataXMLFileExchangeMethod "0"
+      IMSProgType "0"
+      CopyLibPrefix "ARDT"
+      RecordPerformanceResults "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0"
+      OLEType "CContainerView"
+      Readonly "0"
+      Name "Job"
+      NextID "1"
+      IsTopLevel "0"
+      StageList "V1S0|V0S12|V7S0"
+      StageXPos "240|528|816"
+      StageYPos "312|312|312"
+      StageTypes "CCustomStage|CTransformerStage|CCustomStage.CC_GUI"
+      NextStageID "21"
+      SnapToGrid "1"
+      GridLines "0"
+      ZoomValue "100"
+      StageXSize "48|48|48"
+      StageYSize "48|48|48"
+      ContainerViewSizing "0000 0000 0905 0369 0000 0001 0158 0171"
+      StageNames "tmp_TE30DP02_Deuda_por_Interviniente|Tratamiento|THD_INT_CRM_DEUDA_INTERVINIENTES"
+      StageTypeIDs "PxDataSet|CTransformerStage|DB2ConnectorPX"
+      LinkNames "Leer|Cargar| "
+      LinkHasMetaDatas "True|True| "
+      LinkTypes "1|1| "
+      LinkNamePositionXs "363|675| "
+      LinkNamePositionYs "344|344| "
+      TargetStageIDs "V0S12|V7S0| "
+      SourceStageEffectiveExecutionModes "2|2| "
+      SourceStageRuntimeExecutionModes "2|2| "
+      TargetStageEffectiveExecutionModes "2|2| "
+      TargetStageRuntimeExecutionModes "2|2| "
+      LinkIsSingleOperatorLookup "False|False| "
+      LinkIsSortSequential "False|False| "
+      LinkSortMode "0|0| "
+      LinkPartColMode "1|1| "
+      LinkSourcePinIDs "V1S0P2|V0S12P8| "
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S12"
+      OLEType "CTransformerStage"
+      Readonly "0"
+      Name "Tratamiento"
+      NextID "9"
+      InputPins "V0S12P1"
+      OutputPins "V0S12P8"
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TrxGenCode"
+         Value =+=+=+=
+//
+// Generated file to implement the V0S12_TE30DPO2_53_Cargar_Datos_Deuda_por_Interviniente_Tratamiento transform operator.
+//
+
+// define our input/output link names
+inputname 0 Leer;
+outputname 0 Cargar;
+
+initialize {
+ // define our control variables
+ int8 RowRejected0;
+ int8 NullSetVar0;
+
+ // declare our intermediate variables for this section (1)
+ ustring InterVar0_0;
+ date InterVar0_1;
+ string InterVar0_2;
+
+ // initialise constant values which require conversion
+ InterVar0_0 = "00000000";
+ InterVar0_1 = date_from_ustring("0001-01-01");
+ InterVar0_2 = "%yyyy%mm%dd";
+}
+
+mainloop {
+
+ // initialise the rejected row variable
+ RowRejected0 = 1;
+
+ // evaluate columns (no constraints) for link: Cargar
+ Cargar.COD_RECORDID = Leer.ZRECOR_ID;
+ Cargar.ID_CRMGUID = Leer.ZCRM_GUID;
+ Cargar.COD_PARENT = Leer.ZPAREN_ID;
+ Cargar.ID_CLIENTESAT = Leer.ZNUMCLI;
+ Cargar.COD_VINCULACION = Leer.ZTIT_DEU;
+ Cargar.IMP_DEUDAREC = decimal_from_ustring(Leer.ZDEU_REC);
+ Cargar.IMP_DEUDATITULAR = decimal_from_ustring(Leer.ZDEU_TIT);
+ if (((u_string_length(u_trimc_string(Leer.ZFRECIBO)) == 0) || (u_trimc_string(Leer.ZFRECIBO) == InterVar0_0))) {
+  Cargar.FECHA_ULTRECIMP = InterVar0_1;
+ } else {
+  Cargar.FECHA_ULTRECIMP = date_from_ustring(Leer.ZFRECIBO , InterVar0_2);
+ }
+ //;
+ Cargar.IND_TITULARPPAL = Leer.ZTITPRIN;
+ if (((u_string_length(u_trimc_string(Leer.ZFMODIF1)) == 0) || (u_trimc_string(Leer.ZFMODIF1) == InterVar0_0))) {
+  Cargar.FECHA_MODIFI1 = InterVar0_1;
+ } else {
+  Cargar.FECHA_MODIFI1 = date_from_ustring(Leer.ZFMODIF1 , InterVar0_2);
+ }
+ //;
+ writerecord 0;
+ RowRejected0 = 0;
+}
+
+finish {
+}
+
+=+=+=+=
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TrxGenCache"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "TrxClassName"
+         Value "V0S12_TE30DPO2_53_Cargar_Datos_Deuda_por_Interviniente_Tratamiento"
+      END DSSUBRECORD
+      ValidationStatus "0"
+      StageType "CTransformerStage"
+      BlockSize "0"
+      StageVarsMinimised "0"
+      LoopVarsMaximised "0"
+      MaxLoopIterations "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S12P1"
+      OLEType "CTrxInput"
+      Readonly "0"
+      Name "Leer"
+      Partner "V1S0|V1S0P2"
+      LinkType "1"
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "Schema"
+         Value =+=+=+=
+record
+(
+  ZRECOR_ID:ustring[max=32];
+  ZCRM_GUID:nullable ustring[max=32];
+  ZPAREN_ID:nullable ustring[max=32];
+  ZNUMCLI:nullable ustring[max=12];
+  ZTIT_DEU:nullable ustring[max=1];
+  ZDEU_REC:nullable ustring[max=23];
+  ZDEU_TIT:nullable ustring[max=23];
+  ZFRECIBO:nullable ustring[max=10];
+  ZTITPRIN:nullable ustring[max=1];
+  ZFMODIF1:nullable ustring[max=10];
+)
+=+=+=+=
+      END DSSUBRECORD
+      MultiRow "0"
+      LinkMinimised "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V0S12P8"
+      OLEType "CTrxOutput"
+      Readonly "0"
+      Name "Cargar"
+      Partner "V7S0|V7S0P1"
+      Reject "0"
+      ErrorPin "0"
+      RowLimit "0"
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "COD_RECORDID"
+         SqlType "12"
+         Precision "32"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "0"
+         Derivation "Leer.ZRECOR_ID"
+         Group "0"
+         ParsedDerivation "Leer.ZRECOR_ID"
+         SourceColumn "Leer.ZRECOR_ID"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ID_CRMGUID"
+         SqlType "12"
+         Precision "32"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "Leer.ZCRM_GUID"
+         Group "0"
+         ParsedDerivation "Leer.ZCRM_GUID"
+         SourceColumn "Leer.ZCRM_GUID"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "COD_PARENT"
+         SqlType "12"
+         Precision "32"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "Leer.ZPAREN_ID"
+         Group "0"
+         ParsedDerivation "Leer.ZPAREN_ID"
+         SourceColumn "Leer.ZPAREN_ID"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ID_CLIENTESAT"
+         SqlType "12"
+         Precision "12"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "Leer.ZNUMCLI"
+         Group "0"
+         ParsedDerivation "Leer.ZNUMCLI"
+         SourceColumn "Leer.ZNUMCLI"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "COD_VINCULACION"
+         SqlType "1"
+         Precision "1"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "Leer.ZTIT_DEU"
+         Group "0"
+         ParsedDerivation "Leer.ZTIT_DEU"
+         SourceColumn "Leer.ZTIT_DEU"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "IMP_DEUDAREC"
+         SqlType "3"
+         Precision "17"
+         Scale "2"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "StringToDecimal(Leer.ZDEU_REC) "
+         Group "0"
+         ParsedDerivation "StringToDecimal(Leer.ZDEU_REC)"
+         SourceColumn "Leer.ZDEU_REC"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "IMP_DEUDATITULAR"
+         SqlType "3"
+         Precision "17"
+         Scale "2"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "StringToDecimal(Leer.ZDEU_TIT)"
+         Group "0"
+         ParsedDerivation "StringToDecimal(Leer.ZDEU_TIT)"
+         SourceColumn "Leer.ZDEU_TIT"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "FECHA_ULTRECIMP"
+         SqlType "9"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation =+=+=+=
+IF len(TRIM(Leer.ZFRECIBO)) = 0 OR TRIM(Leer.ZFRECIBO) = '00000000'   
+THEN '0001-01-01' ELSE StringToDate(Leer.ZFRECIBO,"%yyyy%mm%dd") 
+=+=+=+=
+         Group "0"
+         ParsedDerivation " IF len(TRIM(Leer.ZFRECIBO)) = 0 OR TRIM(Leer.ZFRECIBO) = '00000000' THEN '0001-01-01' ELSE StringToDate(Leer.ZFRECIBO, \"%yyyy%mm%dd\")"
+         SourceColumn "Leer.ZFRECIBO"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "IND_TITULARPPAL"
+         SqlType "1"
+         Precision "1"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation "Leer.ZTITPRIN"
+         Group "0"
+         ParsedDerivation "Leer.ZTITPRIN"
+         SourceColumn "Leer.ZTITPRIN"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "FECHA_MODIFI1"
+         SqlType "9"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Derivation =+=+=+=
+IF len(TRIM(Leer.ZFMODIF1)) = 0 OR TRIM(Leer.ZFMODIF1) = '00000000' 
+THEN '0001-01-01' ELSE StringToDate(Leer.ZFMODIF1,"%yyyy%mm%dd") 
+=+=+=+=
+         Group "0"
+         ParsedDerivation " IF len(TRIM(Leer.ZFMODIF1)) = 0 OR TRIM(Leer.ZFMODIF1) = '00000000' THEN '0001-01-01' ELSE StringToDate(Leer.ZFMODIF1, \"%yyyy%mm%dd\")"
+         SourceColumn "Leer.ZFMODIF1"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "Schema"
+         Value =+=+=+=
+record
+(
+  COD_RECORDID:string[max=32];
+  ID_CRMGUID:nullable string[max=32];
+  COD_PARENT:nullable string[max=32];
+  ID_CLIENTESAT:nullable string[max=12];
+  COD_VINCULACION:nullable string[1];
+  IMP_DEUDAREC:nullable decimal[17,2];
+  IMP_DEUDATITULAR:nullable decimal[17,2];
+  FECHA_ULTRECIMP:nullable date;
+  IND_TITULARPPAL:nullable string[1];
+  FECHA_MODIFI1:nullable date;
+)
+=+=+=+=
+      END DSSUBRECORD
+      LeftTextPos "675"
+      TopTextPos "344"
+      LinkMinimised "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V1S0"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "tmp_TE30DP02_Deuda_por_Interviniente"
+      NextID "3"
+      OutputPins "V1S0P2"
+      StageType "PxDataSet"
+      AllowColumnMapping "0"
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V1S0P2"
+      OLEType "CCustomOutput"
+      Readonly "0"
+      Name "Leer"
+      Partner "V0S12|V0S12P1"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "dataset"
+         Value "#ParamSetPortFolio.TgtDirectory#/tmp_TE30DP02_Deuda_Intervinientes"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "missingcolmode"
+         Value " "
+      END DSSUBRECORD
+      Columns "COutputColumn"
+      BEGIN DSSUBRECORD
+         Name "ZRECOR_ID"
+         SqlType "-9"
+         Precision "32"
+         Scale "0"
+         Nullable "0"
+         KeyPosition "1"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ZCRM_GUID"
+         SqlType "-9"
+         Precision "32"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ZPAREN_ID"
+         SqlType "-9"
+         Precision "32"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ZNUMCLI"
+         SqlType "-9"
+         Precision "12"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ZTIT_DEU"
+         SqlType "-9"
+         Precision "1"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ZDEU_REC"
+         SqlType "-9"
+         Precision "23"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ZDEU_TIT"
+         SqlType "-9"
+         Precision "23"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ZFRECIBO"
+         SqlType "-9"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ZTITPRIN"
+         SqlType "-9"
+         Precision "1"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ZFMODIF1"
+         SqlType "-9"
+         Precision "10"
+         Scale "0"
+         Nullable "1"
+         KeyPosition "0"
+         DisplaySize "0"
+         Group "0"
+         SortKey "0"
+         SortType "0"
+         AllowCRLF "0"
+         LevelNo "0"
+         Occurs "0"
+         PadNulls "0"
+         SignOption "0"
+         SortingOrder "0"
+         ArrayHandling "0"
+         SyncIndicator "0"
+         PadChar ""
+         ExtendedPrecision "0"
+         TaggedSubrec "0"
+         OccursVarying "0"
+         PKeyIsCaseless "0"
+         SCDPurpose "0"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "DiskWriteInc"
+         Value "1048576"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "BufFreeRun"
+         Value "50"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "MaxMemBufSize"
+         Value "3145728"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "QueueUpperSize"
+         Value "0"
+      END DSSUBRECORD
+      LeftTextPos "363"
+      TopTextPos "344"
+      LinkMinimised "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V7S0"
+      OLEType "CCustomStage"
+      Readonly "0"
+      Name "THD_INT_CRM_DEUDA_INTERVINIENTES"
+      NextID "2"
+      InputPins "V7S0P1"
+      StageType "DB2ConnectorPX"
+      AllowColumnMapping "0"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "9.1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccdb2"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariants"
+         Value "V1;9.1::ccdb2"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsLibraries"
+         Value "ccdb2"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "SupportedVariantsVersions"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Orientation"
+         Value "link"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectFromLink"
+         Value "-1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectThreshold"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectNumber"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectUsesPercentage"
+         Value "false"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "DB2Connector"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Engine"
+         Value "EE"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Context"
+         Value "target"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectionString"
+         Value "/Connection/Database"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Username"
+         Value "/Connection/Username"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Password"
+         Value "/Connection/Password"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Instance"
+         Value "/Connection/Instance"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "DB2ClientLibFile"
+         Value "/Connection/DB2ClientLibFile"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "Conductor"
+         Value "/Connection/Conductor"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConductorInstance"
+         Value "/Connection/Conductor/Instance"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConductorDatabase"
+         Value "/Connection/Conductor/Database"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConductorUsername"
+         Value "/Connection/Conductor/Username"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConductorPassword"
+         Value "/Connection/Conductor/Password"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConductorDB2ClientLibFile"
+         Value "/Connection/Conductor/DB2ClientLibFile"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "XMLProperties"
+         Value "<?xml version='1.0' encoding='UTF-16'?><Properties version='1.1'><Common><Context type='int'>2</Context><Variant type='string'>9.1</Variant><DescriptorVersion type='string'>1.0</DescriptorVersion><PartitionType type='int'>9</PartitionType><RCP type='int'>0</RCP></Common><Connection><Instance modified='1' type='string'><![CDATA[]]></Instance><Database modified='1' type='string'><![CDATA[#PSBD_DWHFI.ConnectionString#]]></Database><Username modified='1' type='string'><![CDATA[#PSBD_DWHFI.Username#]]></Username><Password modified='1' type='string'><![CDATA[#PSBD_DWHFI.Password#]]></Password><DB2ClientLibFile modified='1' type='string'><![CDATA[]]></DB2ClientLibFile><Conductor collapsed='1' modified='1' type='bool'><![CDATA[0]]></Conductor><UseDirectConnections type='bool'><![CDATA[0]]></UseDirectConnections><KeepConductorConnectionAlive type='bool'><![CDATA[1]]></KeepConductorConnectionAlive></Connection><Usage><MigratedJob type='bool'><![CDATA[0]]></MigratedJob><WriteMode modified='1' type='int'><![CDATA[3]]></WriteMode><GenerateSQL modified='1' type='bool'><![CDATA[1]]></GenerateSQL><TableName modified='1' type='string'><![CDATA[#PSBD_DWHFI.SchemaName#THD_INT_CRM_DEUDA_INTERVINIENTES]]></TableName><EnableQuotedIDs type='bool'><![CDATA[0]]></EnableQuotedIDs><XMLColumnAsLOB type='bool'><![CDATA[0]]></XMLColumnAsLOB><PrefixForExpressionColumns type='string'><![CDATA[EXPR]]></PrefixForExpressionColumns><SQL></SQL><TableAction collapsed='1' modified='1' type='int'><![CDATA[0]]></TableAction><Transaction><RecordCount type='int'><![CDATA[2000]]></RecordCount><TimeInterval type='int'><![CDATA[0]]></TimeInterval></Transaction><Session><IsolationLevel type='int'><![CDATA[1]]></IsolationLevel><AutocommitMode type='int'><![CDATA[0]]></AutocommitMode><ArraySize type='int'><![CDATA[2000]]></ArraySize><SchemaReconciliation><FailOnSizeMismatch type='bool'><![CDATA[1]]></FailOnSizeMismatch><FailOnTypeMismatch type='bool'><![CDATA[1]]></FailOnTypeMismatch><FailOnCodePageMismatch type='bool'><![CDATA[0]]></FailOnCodePageMismatch><DropUnmatchedFields type='bool'><![CDATA[1]]></DropUnmatchedFields></SchemaReconciliation><FailOnRowErrorPX type='bool'><![CDATA[1]]></FailOnRowErrorPX></Session><Logging><LogColumnValues modified='1' type='bool'><![CDATA[1]]><LogKeysOnly type='bool'><![CDATA[0]]></LogKeysOnly><Delimiter modified='1' type='int'><![CDATA[1]]></Delimiter></LogColumnValues></Logging><BeforeAfter collapsed='1' type='bool'><![CDATA[0]]></BeforeAfter><ReOptimization type='int'><![CDATA[2]]></ReOptimization><LockWaitMode collapsed='1' type='int'><![CDATA[1]]></LockWaitMode></Usage></Properties >"
+      END DSSUBRECORD
+      NextRecordID "0"
+   END DSRECORD
+   BEGIN DSRECORD
+      Identifier "V7S0P1"
+      OLEType "CCustomInput"
+      Readonly "0"
+      Name "Cargar"
+      Partner "V0S12|V0S12P8"
+      LinkType "1"
+      ConditionNotMet "fail"
+      LookupFail "fail"
+      Properties "CCustomProperty"
+      BEGIN DSSUBRECORD
+         Name "VariantName"
+         Value "9.1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantLibrary"
+         Value "ccdb2"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "VariantVersion"
+         Value "1.0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectFromLink"
+         Value "-1"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectThreshold"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectNumber"
+         Value "0"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "RejectUsesPercentage"
+         Value "false"
+      END DSSUBRECORD
+      BEGIN DSSUBRECORD
+         Name "ConnectorName"
+         Value "DB2Connector"
+      END DSSUBRECORD
+      MetaBag "CMetaProperty"
+      BEGIN DSSUBRECORD
+         Owner "APT"
+         Name "RTColumnProp"
+         Value "0"
+      END DSSUBRECORD
+      TransactionSize "0"
+      TXNBehaviour "0"
+      EnableTxGroup "0"
+      LinkMinimised "0"
+   END DSRECORD
+END DSJOB
