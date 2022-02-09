@@ -1,7 +1,7 @@
 BEGIN HEADER
    CharacterSet "CP1252"
    ExportingTool "IBM InfoSphere DataStage Export"
-   ToolVersion "8"
+   ToolVersion "9"
    ServerName "DATASTAGEDES2"
    ToolInstanceID "DWHFI"
    MDISVersion "1.0"
